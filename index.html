@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ca"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Compilador de pseudocodi (Copy)</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f6f5f1;--card:#fff;--tx:#1d1c1a;--mu:#6b6860;--bd:#dedbd2;--ac:#c4552d;--ok:#1f7a4d;--er:#b3261e;--wa:#9a6700;--code:#faf9f6;--sg:#2f6fb5}
+:root[data-theme="dark"]{--bg:#1b1a18;--card:#262522;--tx:#ecebe6;--mu:#a09d93;--bd:#3a3834;--ac:#e8845f;--ok:#5fcf97;--er:#ff8a80;--wa:#e5b84a;--code:#1f1e1c;--sg:#7db4f0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1a18;--card:#262522;--tx:#ecebe6;--mu:#a09d93;--bd:#3a3834;--ac:#e8845f;--ok:#5fcf97;--er:#ff8a80;--wa:#e5b84a;--code:#1f1e1c;--sg:#7db4f0}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1100px;margin:0 auto;padding:20px 16px 40px}
+h1{font:600 22px Georgia,serif;margin:0 0 2px}p.s{color:var(--mu);margin:0 0 16px}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:800px){.g{grid-template-columns:1fr}}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;min-width:0}
+h2{font:600 12px system-ui;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin:0 0 8px}
+textarea{width:100%;box-sizing:border-box;height:420px;resize:vertical;background:var(--code);color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:10px;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;tab-size:2;white-space:pre}
+button{font:inherit;font-size:13px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;padding:6px 12px;cursor:pointer}
+button.p{background:var(--ac);border-color:var(--ac);color:#fff}button:disabled{opacity:.45;cursor:default}
+.r{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.b{display:inline-block;padding:3px 10px;border-radius:99px;font-size:13px;font-weight:600;border:1px solid currentColor}
+.sg{color:var(--sg)}.ok{color:var(--ok)}.er{color:var(--er)}.wa{color:var(--wa)}
+ul{list-style:none;padding:0;margin:10px 0 0}li.d{padding:6px 8px;border-left:3px solid currentColor;margin-bottom:6px;background:var(--code);border-radius:0 6px 6px 0;cursor:pointer;font-size:13px}
+li.d span{color:var(--tx)}
+.in{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;margin:8px 0}
+input{font:inherit;font-size:14px;padding:5px 8px;border:1px solid var(--bd);border-radius:6px;background:var(--code);color:var(--tx);min-width:0}
+pre{margin:8px 0 0;padding:10px;background:var(--code);border-radius:8px;white-space:pre-wrap;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;min-height:20px;overflow-x:auto}
+table{border-collapse:collapse;font-size:13px;margin-top:8px}td,th{border:1px solid var(--bd);padding:3px 9px;text-align:left}
+footer{text-align:center;color:var(--mu);font-size:11px;letter-spacing:.04em;padding:0 16px 22px;opacity:.8}footer b{font-weight:600}
+[hidden]{display:none!important}.ask{border:1px solid var(--bd);border-radius:8px;padding:10px;margin-top:10px;background:var(--code);font-size:13px}
+code{font:12px ui-monospace,Menlo,Consolas,monospace;background:var(--code);padding:1px 5px;border-radius:4px}.mu{color:var(--mu)}
+.ed{display:flex;border:1px solid var(--bd);border-radius:8px;background:var(--code);overflow:hidden}.ed textarea{border:0;border-radius:0;flex:1;min-width:0;width:auto;outline:none}
+.gt{overflow:hidden;box-sizing:border-box;padding:10px 8px 30px 10px;min-width:24px;text-align:right;color:var(--mu);font:11px/19.5px ui-monospace,Menlo,Consolas,monospace;white-space:pre;user-select:none;border-right:1px solid var(--bd);opacity:.85}
+.ed{align-items:flex-start}.gt{height:420px}
+.fx{border:1px solid var(--bd);border-radius:8px;padding:10px 12px;margin-bottom:10px;background:var(--code)}.fx h3{margin:0 0 6px;font:600 13px system-ui}.fx p{margin:8px 0 0;color:var(--mu);font-size:13px}
+.dl{display:grid;grid-template-columns:56px 1fr;gap:4px 8px;align-items:baseline;font-size:12px;overflow-x:auto}.dl span{color:var(--mu)}.dl code{white-space:pre}
+mark{background:color-mix(in srgb,var(--ac) 30%,transparent);color:inherit;border-radius:3px;padding:0 2px}.lead{margin:0 0 12px;font-size:14px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}.tb{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lang{display:inline-flex;border:1px solid var(--bd);border-radius:8px;overflow:hidden}.lang button{border:0;border-radius:0}.lang button.on{background:var(--ac);color:#fff}
+.wel{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50;overflow:auto}
+.wcard{background:var(--card);border:1px solid var(--bd);border-radius:16px;max-width:660px;width:100%;padding:24px;max-height:92%;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.wcard .tg{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ac);font-weight:600}.wcard h2.wt{font:600 23px/1.25 Georgia,serif;text-transform:none;letter-spacing:0;color:var(--tx);margin:6px 0 6px}
+.stp{display:flex;gap:10px;margin:10px 0;font-size:13.5px}.stp i{flex:none;width:22px;height:22px;border-radius:50%;background:var(--ac);color:#fff;font:600 12px system-ui;display:flex;align-items:center;justify-content:center}.stp b{display:block}.stp span{color:var(--mu)}
+</style></head><body><main>
+<div class="top"><div><h1 data-t>Compilador de pseudocodi</h1><p class="s" data-t>Analitza (lèxic, sintaxi, variables) i executa el teu algoritme. Prem un diagnòstic per a anar a la seua línia.</p></div>
+<div class="tb"><div class="lang"><button id="lv" class="on">Valencià</button><button id="le">Castellano</button></div><button id="ab" data-t>ℹ Sobre el programa</button></div></div>
+<div class="g">
+<div class="c"><h2 data-t>Codi</h2><div class="ed"><div id="gt" class="gt">1</div><textarea id="src" wrap="off" spellcheck="false" placeholder="Escriu ací el teu codi..."></textarea></div>
+<div class="r"><button data-t id="bo" disabled title="Encara no has apegat cap codi">Carregar l'original</button><button data-t id="bc">Carregar el corregit</button><button data-t id="be">Veure tot el codi</button></div>
+<div id="ask" class="ask" hidden><div data-t>Què vols fer amb el primer codi que vas apegar?</div><div class="r"><button data-t class="p" id="a1">Tornar a carregar l'original</button><button data-t id="a2">Només comparar</button><button data-t id="a3">Cancel·lar</button></div></div>
+<div id="conv" class="ask" hidden></div></div>
+<div class="c"><h2 data-t>Compilació</h2><span id="st" class="b"></span> <button id="fx" class="p" disabled style="margin-left:6px">Corregir</button><ul id="dg"></ul>
+<h2 style="margin-top:16px" data-t>Execució</h2><div id="inp" class="in"></div>
+<button data-t class="p" id="run">Executar</button><pre id="out"></pre><div id="vars"></div></div>
+</div><div class="c" id="cmpc" hidden style="margin-top:14px"></div>
+</main>
+<footer data-t>Fet per <b>Manuel Loharces Melchor</b> &amp; <b>Claude</b> · Anthropic</footer>
+<div id="wel" class="wel"></div>
+<script>
+const FIXED_ES=`INICIO
+LEER horas_aparcado, tarjeta_cliente, dinero_entregado
+
+SI horas_aparcado <= 2 ENTONCES
+  precio_hora <-- 2
+SINO
+  SI horas_aparcado <= 5 ENTONCES
+    precio_hora <-- 1,5
+  SINO
+    precio_hora <-- 1
+  FIN_SI
+FIN_SI
+
+precio_inicial <-- horas_aparcado * precio_hora
+
+SI tarjeta_cliente = "SI" ENTONCES
+  descuento <-- (precio_inicial * 10) / 100
+SINO
+  descuento <-- 0
+FIN_SI
+precio_total <-- precio_inicial - descuento
+
+ESCRIBIR "El coste inicial de tu aparcamiento es ", precio_inicial
+ESCRIBIR "El descuento aplicado es de ", descuento
+ESCRIBIR "El precio final de tu aparcamiento es ", precio_total
+
+SI dinero_entregado > precio_total ENTONCES
+  cambio <-- dinero_entregado - precio_total
+  ESCRIBIR "¡Te sobra dinero! Tu cambio es de ", cambio
+SINO
+  SI dinero_entregado < precio_total ENTONCES
+    faltan <-- precio_total - dinero_entregado
+    ESCRIBIR "Te faltan ", faltan, " para completar el pago"
+  SINO
+    ESCRIBIR "Pago exacto. Gracias por tu estancia, ¡BUENA SUERTE!"
+  FIN_SI
+FIN_SI
+FIN`;
+const FIXED=`INICI
+LLEGIR Hores_aparcat, Target_client, Diners_entregats
+
+SI Hores_aparcat <= 2 LLAVORS
+  preu_hora <-- 2
+SINO
+  SI Hores_aparcat <= 5 LLAVORS
+    preu_hora <-- 1,5
+  SINO
+    preu_hora <-- 1
+  FI_SI
+FI_SI
+
+preu_inicial <-- Hores_aparcat * preu_hora
+
+SI Target_client = "SI" LLAVORS
+  descompte <-- (preu_inicial * 10) / 100
+SINO
+  descompte <-- 0
+FI_SI
+preu_total <-- preu_inicial - descompte
+
+MOSTRAR "El cost inicial del teu aparcament es ", preu_inicial
+MOSTRAR "El descompte aplicat es de ", descompte
+MOSTRAR "El preu final del teu aparcament es ", preu_total
+
+SI Diners_entregats > preu_total LLAVORS
+  canvi <-- Diners_entregats - preu_total
+  MOSTRAR "Et sobra diners!! El teu canvi es de ", canvi
+SINO
+  SI Diners_entregats < preu_total LLAVORS
+    falten <-- preu_total - Diners_entregats
+    MOSTRAR "Et falten ", falten, " per a poder completar el pagament"
+  SINO
+    MOSTRAR "Pagament exacte. Gracies per la teua estada, BONA SORT!!"
+  FI_SI
+FI_SI
+FI`;
+const KW=new Set(['INICI','FI','LLEGIR','SI','LLAVORS','SINO','FI_SI','SI_FI','MOSTRAR','AND','OR','NOT']);
+let LANG='va';
+const KWES={INICIO:'INICI',LEER:'LLEGIR',ENTONCES:'LLAVORS',SINO:'SINO',SI_NO:'SINO',SI:'SI',FIN_SI:'FI_SI',SI_FIN:'SI_FI',FIN:'FI',MOSTRAR:'MOSTRAR',ESCRIBIR:'MOSTRAR',IMPRIMIR:'MOSTRAR',AND:'AND',OR:'OR',NOT:'NOT'};
+function kwm(w){const u=w.toUpperCase();if(LANG==='es'){if(w==='Y')return'AND';if(w==='O')return'OR';if(w==='NO')return'NOT';return KWES[u]||null}return KW.has(u)?u:null}
+const KN=k=>LANG==='es'?({LLAVORS:'ENTONCES',FI_SI:'FIN_SI'}[k]||k):k;
+function lex(s,dg){const T=[];let i=0,L=1;const n=s.length;
+let st=0;const fin=()=>{const q=T[T.length-1];if(q&&q.pos===undefined){q.pos=st;q.end=i}};
+while(i<n){fin();st=i;const c=s[i];
+if(c==='\n'){T.push({t:'nl',line:L});L++;i++;continue}
+if(/[ \t\r\u00a0]/.test(c)){i++;continue}
+if(c==='/'&&s[i+1]==='/'){while(i<n&&s[i]!=='\n')i++;continue}
+if(/[“”"]/.test(c)){let j=i+1;while(j<n&&!/[“”"\n]/.test(s[j]))j++;
+ if(j>=n||s[j]==='\n'){dg.push({sev:'er',line:L,msg:'Cadena de text sense tancar'});i=j;continue}
+ T.push({t:'str',v:s.slice(i+1,j),line:L});i=j+1;continue}
+if(/\d/.test(c)){let j=i;while(/\d/.test(s[j]||''))j++;
+ if((s[j]===','||s[j]==='.')&&/\d/.test(s[j+1]||'')){j++;while(/\d/.test(s[j]||''))j++}
+ T.push({t:'num',v:parseFloat(s.slice(i,j).replace(',','.')),line:L});i=j;continue}
+if(/[A-Za-zÀ-ÿ_]/.test(c)){let j=i;while(/[\wÀ-ÿ]/.test(s[j]||''))j++;const w=s.slice(i,j),u=w.toUpperCase();
+ {const k=kwm(w);T.push(k?{t:'kw',v:k,line:L}:{t:'id',v:w,line:L})};i=j;continue}
+if(s.startsWith('<--',i)){T.push({t:'op',v:'<-',line:L});i+=3;continue}
+if(s.startsWith('<-',i)||c==='←'){T.push({t:'op',v:'<-',line:L});i+=c==='←'?1:2;continue}
+const two=s.slice(i,i+2);if(['<=','>=','<>'].includes(two)){T.push({t:'op',v:two,line:L});i+=2;continue}
+if('+-*/(),=<>–—'.includes(c)){T.push({t:'op',v:(c==='–'||c==='—')?'-':c,line:L});i++;continue}
+dg.push({sev:'er',line:L,msg:`Caràcter no vàlid «${c}»`});i++}
+fin();return T}
+function parse(T,dg){let p=0;const extra=[];const eofL=(T[T.length-1]||{line:1}).line;
+const pk=()=>T[p]||{t:'eof',line:eofL},nx=()=>T[p++]||pk();
+const fail=(m,t=pk())=>{throw{line:t.line,msg:m}};
+const op=v=>{const t=pk();return t.t==='op'&&t.v===v};
+const acc=v=>op(v)?(p++,true):false;
+const kw=v=>{const t=pk();return t.t==='kw'&&t.v===v};
+const show=t=>t.t==='nl'?'final de línia':t.t==='eof'?'final del programa':String(t.v);
+const end=()=>{const t=pk();if(t.t==='nl')p++;else if(t.t!=='eof')fail(`Element inesperat «${show(t)}» (falta una coma o un operador?)`)};
+function prim(){const t=nx();
+ if(t.t==='num')return{k:'num',v:t.v,line:t.line};
+ if(t.t==='str')return{k:'str',v:t.v,line:t.line};
+ if(t.t==='id'){let n=t.v,last=t;const parts=[t.v];while(pk().t==='id'&&pk().line===t.line){last=nx();parts.push(last.v);n+='_'+last.v}
+  if(parts.length>1)dg.push({sev:'wa',line:t.line,msg:`Espai dins d'un nom: «${parts.join(' ')}» s'ha interpretat com «${n}»`,fix:{pos:t.pos,end:last.end,text:n,kind:'espai',why:`Un nom de variable no pot portar espais: l'ordinador llig «${parts.join('» i «')}» com a paraules diferents i no sap què fer-ne. S'han unit amb un guió baix perquè siga un únic nom.`}});
+  return{k:'var',n,line:t.line,pos:t.pos,end:last.end}}
+ if(t.t==='op'&&t.v==='('){const e=or();if(!acc(')'))fail("Falta tancar el parèntesi ')'");return e}
+ if(t.t==='op'&&t.v==='-')return{k:'un',o:'-',e:prim(),line:t.line};
+ p--;fail(`S'esperava una expressió però s'ha trobat ${show(t)}`,t)}
+function mul(){let l=prim();while(op('*')||op('/')){const o=nx();l={k:'bin',o:o.v,l,r:prim(),line:o.line}}return l}
+function add(){let l=mul();while(op('+')||op('-')){const o=nx();l={k:'bin',o:o.v,l,r:mul(),line:o.line}}return l}
+function cmp(){let l=add();while(['<','>','<=','>=','=','<>'].some(op)){const o=nx();l={k:'bin',o:o.v,l,r:add(),line:o.line}}return l}
+function nt(){if(kw('NOT')){const t=nx();return{k:'un',o:'NOT',e:nt(),line:t.line}}return cmp()}
+function and(){let l=nt();while(kw('AND')){const t=nx();l={k:'bin',o:'AND',l,r:nt(),line:t.line}}return l}
+function or(){let l=and();while(kw('OR')){const t=nx();l={k:'bin',o:'OR',l,r:and(),line:t.line}}return l}
+const STOP=['SINO','FI_SI','SI_FI','FI'];
+function stmt(){const t=pk(),line=t.line;
+ if(t.t==='kw'&&t.v==='LLEGIR'){nx();const ids=[];do{const x=nx();if(x.t!=='id'){p--;fail("S'esperava un nom de variable",x)}ids.push(x.v)}while(acc(','));end();return{k:'read',ids,line}}
+ if(t.t==='kw'&&t.v==='MOSTRAR'){nx();const it=[or()];for(;;){if(acc(','))it.push(or());else if(['str','num','id'].includes(pk().t)){dg.push({sev:'wa',line:pk().line,msg:"Falta una coma entre els elements del MOSTRAR; s'ha afegit",fix:{pos:T[p-1].end,end:T[p-1].end,text:',',kind:'coma',why:'Els elements d\'un MOSTRAR s\'han de separar amb comes. Sense la coma, el text i la variable es lligen com una expressió trencada i la instrucció no es pot executar.'}});it.push(or())}else break}end();return{k:'show',it,line}}
+ if(t.t==='kw'&&t.v==='SI'){nx();const c=or();if(kw('LLAVORS'))nx();else dg.push({sev:'er',line:T[p-1].line,msg:'Falta LLAVORS després de la condició',fix:{pos:T[p-1].end,end:T[p-1].end,text:' '+KN('LLAVORS'),kind:'llavors',why:'Tot SI necessita la paraula LLAVORS darrere de la condició per a marcar on comença el bloc que s\'executa quan la condició es compleix.'}});end();
+  const a=block(STOP);let b=[];if(kw('SINO')){nx();end();b=block(STOP)}
+  if(kw('FI_SI'))nx();else if(kw('SI_FI')){dg.push({sev:'wa',line:pk().line,msg:"S'ha escrit «SI_FI»; s'ha interpretat com a FI_SI",fix:{pos:pk().pos,end:pk().end,text:KN('FI_SI'),kind:'tanca',why:'Un SI es tanca amb FI_SI, no amb SI_FI. Amb el tancament equivocat l\'estructura queda oberta i el programa no sap on acaba la decisió.'}});nx()}
+  else fail(`Falta FI_SI per a tancar el SI de la línia ${line}`);
+  end();return{k:'if',c,a,b,line}}
+ if(t.t==='id'){nx();if(!acc('<-'))fail(`S'esperava «<--» després de «${t.v}»`);const e=or();end();return{k:'set',n:t.v,e,line}}
+ if(t.t==='kw')fail(`«${t.v}» inesperat ací (falta un SI?)`);
+ fail(`Instrucció no reconeguda «${show(t)}»`)}
+function block(stops){const r=[];for(;;){while(pk().t==='nl')p++;const t=pk();if(t.t==='eof')break;
+ if(t.t==='kw'&&stops.includes(t.v))break;
+ const s0=p;try{r.push(stmt())}catch(e){if(!e.msg)throw e;{const a=T[s0],b=T[s0+1];if(a&&a.t==='id'&&b&&b.t==='op'&&b.v==='<-')extra.push(a.v)}dg.push({sev:'er',line:e.line,msg:e.msg});while(pk().t!=='nl'&&pk().t!=='eof')p++;if(pk().t==='nl')p++}}return r}
+while(pk().t==='nl')p++;
+if(kw('INICI'))nx();else dg.push({sev:'er',line:pk().line,msg:'El programa ha de començar amb INICI'});
+let body=[];for(;;){body=body.concat(block(['FI']));
+ if(kw('FI')){nx();break}
+ if(pk().t==='eof'){dg.push({sev:'er',line:eofL,msg:'Falta FI al final del programa'});break}}
+body.extra=extra;return body}
+function lev(a,b){const d=Array.from({length:a.length+1},(_,i)=>[i]);for(let j=1;j<=b.length;j++)d[0][j]=j;
+for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[a.length][b.length]}
+function analyze(prog,dg){const ever=new Map(),inputs=[],reads=new Set(),sg=new Set(),asg=new Map();
+function use(e,def){if(e.k==='var'){let k=e.n.toLowerCase();
+ if(!ever.has(k)){let best=null,bd=k.length<4?0:(k.length<8?2:3);for(const[kk,nm]of ever){const d=lev(k,kk);if(d<bd){bd=d;best=nm}}
+  if(best){dg.push({sev:'wa',line:e.line,msg:`Variable «${e.n}» no definida; s'ha interpretat com «${best}»`,fix:{pos:e.pos,end:e.end,text:best,kind:'nom',why:`La variable «${e.n}» no està definida enlloc (ni amb LLEGIR ni amb una assignació). Pel context i per la semblança, és «${best}»: es tracta d'un error d'escriptura. Una variable ha de tindre exactament el mateix nom a tot arreu on s'use.`}});e.n=best;k=best.toLowerCase()}
+  else dg.push({sev:'er',line:e.line,msg:`Variable «${e.n}» no definida`})}
+ reads.add(k);if(ever.has(k)&&!def.has(k)&&!sg.has(k)){sg.add(k);dg.push({sev:'wa',line:e.line,msg:`«${e.n}» pot no tindre valor: només s'assigna en algunes branques del SI. Mostra-la dins de la branca on s'assigna.`})}}
+ else if(e.k==='bin'){use(e.l,def);use(e.r,def)}else if(e.k==='un')use(e.e,def)}
+function redund(s){const c=s.c;if(!(c.k==='bin'&&c.o==='<='&&c.l.k==='var'&&c.r.k==='num'))return;
+ for(const x of s.b){const y=x.k==='if'&&x.c.k==='bin'&&x.c.o==='AND'?x.c.l:null;
+  if(y&&y.k==='bin'&&y.o==='>'&&y.l.k==='var'&&y.l.n.toLowerCase()===c.l.n.toLowerCase()&&y.r.k==='num'&&y.r.v===c.r.v)
+   dg.push({sev:'sg',line:x.line,msg:`«${y.l.n} > ${c.r.v}» sobra: ja és cert perquè estàs dins del SINO de «${c.l.n} <= ${c.r.v}». Pots llevar-la.`})}}
+function walk(ss,def){for(const s of ss){
+ if(s.k==='read')s.ids.forEach(n=>{ever.set(n.toLowerCase(),n);def.add(n.toLowerCase());inputs.push(n)});
+ else if(s.k==='set'){use(s.e,def);if(!asg.has(s.n.toLowerCase()))asg.set(s.n.toLowerCase(),{n:s.n,line:s.line});ever.set(s.n.toLowerCase(),s.n);def.add(s.n.toLowerCase())}
+ else if(s.k==='show')s.it.forEach(e=>use(e,def));
+ else{redund(s);use(s.c,def);const a=new Set(def),b=new Set(def);walk(s.a,a);walk(s.b,b);for(const x of a)if(b.has(x))def.add(x)}}}
+const ex0=(prog.extra||[]).map(n=>n.toLowerCase());ex0.forEach(n=>ever.set(n,n));walk(prog,new Set(ex0));for(const[k,v]of asg)if(!reads.has(k))dg.push({sev:'sg',line:v.line,msg:`«${v.n}» es calcula però no s'usa enlloc. Pots llevar-la.`});return inputs}
+const fmt=v=>typeof v==='number'?(Number.isInteger(v)?String(v):v.toFixed(2).replace('.',',')):String(v);
+function run(prog,vals,out){const env=new Map();
+const ev=e=>{switch(e.k){case'num':case'str':return e.v;
+ case'var':{const k=e.n.toLowerCase();if(!env.has(k))throw{line:e.line,msg:`La variable «${e.n}» no té valor`};return env.get(k)}
+ case'un':{const v=ev(e.e);if(e.o==='NOT'){if(typeof v!=='boolean')throw{line:e.line,msg:'NOT requereix una condició'};return!v}
+  if(typeof v!=='number')throw{line:e.line,msg:'Operació numèrica sobre un text'};return-v}
+ case'bin':{const o=e.o;
+  if(o==='AND'||o==='OR'){const a=ev(e.l),b=ev(e.r);if(typeof a!=='boolean'||typeof b!=='boolean')throw{line:e.line,msg:o+' requereix condicions'};return o==='AND'?a&&b:a||b}
+  const a=ev(e.l),b=ev(e.r);
+  if(['=','<>','<','>','<=','>='].includes(o)){if(typeof a!==typeof b)throw{line:e.line,msg:'Es comparen tipus diferents (número i text)'};
+   return{'=':a===b,'<>':a!==b,'<':a<b,'>':a>b,'<=':a<=b,'>=':a>=b}[o]}
+  if(o==='+'&&(typeof a==='string'||typeof b==='string'))return fmt(a)+fmt(b);
+  if(typeof a!=='number'||typeof b!=='number')throw{line:e.line,msg:`L'operació «${o}» requereix números`};
+  if(o==='/'&&b===0)throw{line:e.line,msg:'Divisió entre zero'};
+  const r={'+':a+b,'-':a-b,'*':a*b,'/':a/b}[o];return Math.round(r*1e9)/1e9}}};
+const ex=ss=>{for(const s of ss){
+ if(s.k==='read')s.ids.forEach(n=>env.set(n.toLowerCase(),vals[n.toLowerCase()]));
+ else if(s.k==='set')env.set(s.n.toLowerCase(),ev(s.e));
+ else if(s.k==='show'){try{out.push(s.it.map(e=>fmt(ev(e))).join(''))}catch(e){if(!e.msg)throw e;out.push(tr(`⚠ Línia ${e.line}: ${e.msg} (no s'ha pogut mostrar)`))}}
+ else{const c=ev(s.c);if(typeof c!=='boolean')throw{line:s.line,msg:'La condició del SI no és vertadera/falsa'};ex(c?s.a:s.b)}}};
+try{ex(prog)}catch(e){if(!e.msg)throw e;out.push(tr(`✖ Error d'execució (línia ${e.line}): ${e.msg}`))}
+return env}
+const $=id=>document.getElementById(id),src=$('src');let cur=null,fixes=[],firstCode=null;
+const P=[
+['Cadena de text sense tancar','Cadena de texto sin cerrar'],['Caràcter no vàlid','Carácter no válido'],['Element inesperat','Elemento inesperado'],
+['(falta una coma o un operador?)','(¿falta una coma o un operador?)'],['final de línia','final de línea'],['Falta tancar el parèntesi','Falta cerrar el paréntesis'],
+["S'esperava una expressió però s'ha trobat","Se esperaba una expresión pero se ha encontrado"],["S'esperava un nom de variable","Se esperaba un nombre de variable"],
+["S'esperava «<--» després de","Se esperaba «<--» después de"],['després de la condició','después de la condición'],["S'ha escrit",'Se ha escrito'],
+["s'ha interpretat com a","se ha interpretado como"],["s'ha interpretat com","se ha interpretado como"],['per a tancar el SI de la línia','para cerrar el SI de la línea'],
+['inesperat ací (falta un SI?)','inesperado aquí (¿falta un SI?)'],['Instrucció no reconeguda','Instrucción no reconocida'],['El programa ha de començar amb','El programa debe empezar con'],
+["Espai dins d'un nom:",'Espacio dentro de un nombre:'],["Falta una coma entre els elements del MOSTRAR; s'ha afegit","Falta una coma entre los elementos del MOSTRAR; se ha añadido"],
+["pot no tindre valor: només s'assigna en algunes branques del SI. Mostra-la dins de la branca on s'assigna.","puede no tener valor: solo se asigna en algunas ramas del SI. Muéstrala dentro de la rama donde se asigna."],
+[' sobra: ja és cert perquè estàs dins del SINO de ',' sobra: ya es cierto porque estás dentro del SINO de '],['. Pots llevar-la.','. Puedes quitarla.'],
+[" es calcula però no s'usa enlloc"," se calcula pero no se usa en ningún sitio"],[' no té valor',' no tiene valor'],['NOT requereix una condició','NOT requiere una condición'],
+['Operació numèrica sobre un text','Operación numérica sobre un texto'],[' requereix condicions',' requiere condiciones'],['Es comparen tipus diferents (número i text)','Se comparan tipos distintos (número y texto)'],
+["L'operació",'La operación'],[' requereix números',' requiere números'],['Divisió entre zero','División entre cero'],['La condició del SI no és vertadera/falsa','La condición del SI no es verdadera/falsa'],
+["Error d'execució",'Error de ejecución'],["(no s'ha pogut mostrar)",'(no se ha podido mostrar)'],['Ompli el valor de','Rellena el valor de'],
+['✔ Compilat sense errors','✔ Compilado sin errores'],['Esperant codi…','Esperando código…'],
+['Codi corregit · resum dels canvis','Código corregido · resumen de los cambios'],[/(\d+) correccions aplicades/g,'$1 correcciones aplicadas'],[/(\d+) correcció aplicada/g,'$1 corrección aplicada'],
+[" al teu primer codi. Només s'ha modificat allò que estava marcat: l'ordre, la sangria i l'estructura del programa són els mateixos."," en tu primer código. Solo se ha modificado lo que estaba marcado: el orden, la sangría y la estructura del programa son los mismos."],
+['No hi havia res per a corregir automàticament.','No había nada que corregir automáticamente.'],[" El teu codi no té errors d'escriptura detectables."," Tu código no tiene errores de escritura detectables."],
+['<span>Abans</span>','<span>Antes</span>'],['<span>Després</span>','<span>Después</span>'],['Per què:','Por qué:'],['>Resultat<','>Resultado<'],
+[/Encara queden (\d+) errors que cal revisar a mà:/g,'Aún quedan $1 errores que hay que revisar a mano:'],[/Encara queden (\d+) error que cal revisar a mà:/g,'Aún queda $1 error que hay que revisar a mano:'],
+['✔ El codi compila sense errors','✔ El código compila sin errores'],[' i ja es pot executar.',' y ya se puede ejecutar.'],['Millores recomanades (no aplicades)','Mejoras recomendadas (no aplicadas)'],
+["No s'han canviat soles perquè afecten la lògica del programa: decideix tu si t'interessen.","No se han cambiado solas porque afectan a la lógica del programa: decide tú si te interesan."],
+['Nom de variable mal escrit','Nombre de variable mal escrito'],["Espai dins d'un nom de variable",'Espacio dentro de un nombre de variable'],['Coma que faltava','Coma que faltaba'],['Tancament del SI incorrecte','Cierre del SI incorrecto'],['Correcció','Corrección'],
+["Un nom de variable no pot portar espais: l'ordinador llig ","Un nombre de variable no puede llevar espacios: el ordenador lee "],
+[" com a paraules diferents i no sap què fer-ne. S'han unit amb un guió baix perquè siga un únic nom."," como palabras distintas y no sabe qué hacer con ellas. Se han unido con un guion bajo para que sea un único nombre."],
+["Els elements d'un MOSTRAR s'han de separar amb comes. Sense la coma, el text i la variable es lligen com una expressió trencada i la instrucció no es pot executar.","Los elementos de un MOSTRAR se deben separar con comas. Sin la coma, el texto y la variable se leen como una expresión rota y la instrucción no se puede ejecutar."],
+["Tot SI necessita la paraula LLAVORS darrere de la condició per a marcar on comença el bloc que s'executa quan la condició es compleix.","Todo SI necesita la palabra LLAVORS detrás de la condición para marcar dónde empieza el bloque que se ejecuta cuando la condición se cumple."],
+["Un SI es tanca amb FI_SI, no amb SI_FI. Amb el tancament equivocat l'estructura queda oberta i el programa no sap on acaba la decisió.","Un SI se cierra con FI_SI, no con SI_FI. Con el cierre equivocado la estructura queda abierta y el programa no sabe dónde acaba la decisión."],
+[" no està definida enlloc (ni amb LLEGIR ni amb una assignació). Pel context i per la semblança, és "," no está definida en ningún sitio (ni con LLEGIR ni con una asignación). Por el contexto y por el parecido, es "],
+["»: es tracta d'un error d'escriptura. Una variable ha de tindre exactament el mateix nom a tot arreu on s'use.","»: se trata de un error de escritura. Una variable debe tener exactamente el mismo nombre en todas partes donde se use."],
+['Comparació: primer codi apegat vs. codi editat','Comparación: primer código pegado vs. código editado'],['>Editat<','>Editado<'],['>Errors<','>Errores<'],
+['El codi actual és idèntic al primer que vas apegar: encara no has canviat res.','El código actual es idéntico al primero que pegaste: aún no has cambiado nada.'],
+["Diagnòstics de l'original",'Diagnósticos del original'],["L'original no tenia cap diagnòstic.",'El original no tenía ningún diagnóstico.'],['✔ Corregit','✔ Corregido'],['● Encara hi és','● Todavía está'],
+['Nous en el codi editat','Nuevos en el código editado'],['El nombre de línies ha canviat','El número de líneas ha cambiado'],[', així que no es pot comparar línia a línia.',', así que no se puede comparar línea a línea.'],
+['Cap línia modificada.','Ninguna línea modificada.'],[/…i (\d+) més\./g,'…y $1 más.'],['Tancar comparació','Cerrar comparación'],['Tancar','Cerrar'],['Fet per','Hecho por'],
+[/Encara queden/g,'Aún quedan'],[/(\d+) errors\b/g,'$1 errores'],[/· (\d+) avisos/g,'· $1 avisos'],[/· (\d+) avís/g,'· $1 aviso'],
+['Suggeriments','Sugerencias'],['Suggeriment','Sugerencia'],['Avís','Aviso'],['Línies','Líneas'],['línia','línea'],['Línia','Línea'],[' i ',' y '],
+[/\bLLAVORS\b/g,'ENTONCES'],[/\bSI_FI\b/g,'SI_FIN'],[/\bFI_SI\b/g,'FIN_SI'],[/\bFI\b/g,'FIN'],[/\bINICI\b/g,'INICIO'],[/\bLLEGIR\b/g,'LEER'],[/\bMOSTRAR\b/g,'ESCRIBIR']
+];
+const X={'Compilador de pseudocodi':'Compilador de pseudocódigo','Codi':'Código','Compilació':'Compilación','Execució':'Ejecución','Executar':'Ejecutar',"Carregar l'original":'Cargar el original','Carregar el corregit':'Cargar el corregido','Veure tot el codi':'Ver todo el código','Tornar a la mida normal':'Volver al tamaño normal',"Tornar a carregar l'original":'Volver a cargar el original','Només comparar':'Solo comparar','Cancel·lar':'Cancelar','Tancar':'Cerrar','Escriu ací el teu codi...':'Escribe aquí tu código...','Encara no has apegat cap codi':'Aún no has pegado ningún código','Què vols fer amb el primer codi que vas apegar?':'¿Qué quieres hacer con el primer código que pegaste?','ℹ Sobre el programa':'ℹ Acerca del programa','Analitza (lèxic, sintaxi, variables) i executa el teu algoritme. Prem un diagnòstic per a anar a la seua línia.':'Analiza (léxico, sintaxis, variables) y ejecuta tu algoritmo. Pulsa un diagnóstico para ir a su línea.'};
+function tr(s){if(LANG!=='es'||typeof s!=='string')return s;if(X[s])return X[s];
+ return s.split(/(<code[^>]*>[\s\S]*?<\/code>)/).map((g,i)=>i%2?g:P.reduce((a,[f,t])=>typeof f==='string'?a.split(f).join(t):a.replace(f,t),g)).join('')}
+const RK={er:0,wa:1,sg:2},cmpD=(a,b)=>a.line-b.line||RK[a.sev]-RK[b.sev];
+function uniq(a){const seen=new Set();for(let i=0;i<a.length;i++){const k=a[i].sev+'|'+a[i].line+'|'+a[i].msg;if(seen.has(k)){a.splice(i,1);i--}else seen.add(k)}}
+function fxUpd(){const b=$('fx');b.disabled=!fixes.length;b.textContent=fixes.length?`Corregir (${fixes.length})`:'Corregir'}
+let fullOn=false,prevH='';
+function fit(){if(fullOn)src.style.height=(src.value.split('\n').length*19.5+44)+'px';$('gt').style.height=src.offsetHeight+'px'}
+function gut(){fit();const v=src.value,L=v.split('\n');let last=L.length;while(last>1&&!L[last-1].trim())last--;const cl=v.slice(0,src.selectionStart||0).split('\n').length;const n=Math.max(last,document.activeElement===src?cl:1);$('gt').textContent=Array.from({length:n},(_,i)=>i+1).join('\n');$('gt').scrollTop=src.scrollTop}
+function compile(nc){gut();if(!src.value.trim()){fixes=[];fxUpd();$('bo').disabled=firstCode===null;const st=$('st');st.className='b';st.style.color='var(--mu)';st.textContent=tr('Esperant codi…');$('dg').innerHTML='';$('inp').innerHTML='';$('out').textContent='';$('vars').innerHTML='';$('run').disabled=true;cur=null;return}
+$('st').style.color='';if(firstCode===null&&!nc)firstCode=src.value;$('bo').disabled=firstCode===null;const dg=[];const T=lex(src.value,dg);const prog=parse(T,dg);const inputs=analyze(prog,dg);
+dg.sort(cmpD);fixes=dg.filter(d=>d.fix).map(d=>d.fix);fxUpd();uniq(dg);const ne=dg.filter(d=>d.sev==='er').length,nw=dg.filter(d=>d.sev==='wa').length;
+const st=$('st');st.className='b '+(ne?'er':'ok');st.textContent=ne?`✖ ${ne} error${ne>1?'s':''}`+(nw?` · ${nw} ${nw>1?'avisos':'avís'}`:''):`✔ Compilat sense errors`+(nw?` · ${nw} ${nw>1?'avisos':'avís'}`:'');
+st.textContent=tr(st.textContent);const ul=$('dg');ul.innerHTML='';dg.forEach(d=>{const li=document.createElement('li');li.className='d '+d.sev;
+ li.innerHTML='<b></b> <span></span>';li.firstChild.textContent=tr((d.sev==='er'?'Error':d.sev==='sg'?'Suggeriment':'Avís')+' · línia ')+d.line;li.lastChild.textContent=tr(d.msg);
+ li.onclick=()=>{const ls=src.value.split('\n');let a=0;for(let i=0;i<d.line-1;i++)a+=ls[i].length+1;src.focus();src.setSelectionRange(a,a+(ls[d.line-1]||'').length);src.scrollTop=Math.max(0,(d.line-4)*19.5);$('gt').scrollTop=src.scrollTop};ul.appendChild(li)});
+const box=$('inp');box.innerHTML='';cur=ne?null:{prog,inputs};$('run').disabled=!!ne;$('out').textContent='';$('vars').innerHTML='';
+if(!ne){[...new Set(inputs)].forEach(n=>{const l=document.createElement('label');l.textContent=n;const i=document.createElement('input');i.dataset.n=n.toLowerCase();i.placeholder=/target|tarjeta/i.test(n)?'SI / NO':'0';box.append(l,i)})}}
+$('run').onclick=()=>{if(!cur)return;const vals={};let bad=null;
+document.querySelectorAll('#inp input').forEach(i=>{const v=i.value.trim();if(v==='')bad=i.dataset.n;else vals[i.dataset.n]=/^-?\d+([.,]\d+)?$/.test(v)?parseFloat(v.replace(',','.')):v});
+const out=[];if(bad){$('out').textContent=tr(`Ompli el valor de «${bad}».`);return}
+const env=run(cur.prog,vals,out);$('out').textContent=out.join('\n');
+let h='<table><tr><th>Variable</th><th>Valor</th></tr>';for(const[k,v]of env)h+=`<tr><td>${k}</td><td>${fmt(v).replace(/</g,'&lt;')}</td></tr>`;$('vars').innerHTML=h+'</table>'};
+let tm;src.oninput=()=>{gut();clearTimeout(tm);tm=setTimeout(compile,250)};
+const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const LB={er:'Error',wa:'Avís',sg:'Suggeriment'};
+function diag(t,raw){const d=[];const T=lex(t,d);const pr=parse(T,d);analyze(pr,d);d.sort(cmpD);if(!raw)uniq(d);return d}
+const cnt=(d,k)=>d.filter(x=>x.sev===k).length;
+function renderCmp(){const cur0=src.value,o=diag(firstCode),n=diag(cur0);
+ const kn=new Set(n.map(x=>x.sev+'|'+x.msg)),ko=new Set(o.map(x=>x.sev+'|'+x.msg));
+ let h='<h2>Comparació: primer codi apegat vs. codi editat</h2><table><tr><th></th><th>Errors</th><th>Avisos</th><th>Suggeriments</th></tr>'
+  +`<tr><td>Original</td><td>${cnt(o,'er')}</td><td>${cnt(o,'wa')}</td><td>${cnt(o,'sg')}</td></tr><tr><td>Editat</td><td>${cnt(n,'er')}</td><td>${cnt(n,'wa')}</td><td>${cnt(n,'sg')}</td></tr></table>`;
+ if(firstCode===cur0)h+='<p class="mu">El codi actual és idèntic al primer que vas apegar: encara no has canviat res.</p>';
+ h+='<h2 style="margin-top:14px">Diagnòstics de l\'original</h2><ul>';
+ if(!o.length)h+='<li class="d ok">L\'original no tenia cap diagnòstic.</li>';
+ o.forEach(x=>{const ok=!kn.has(x.sev+'|'+x.msg);h+=`<li class="d ${x.sev}"><b>${LB[x.sev]} · línia ${x.line}</b> <span>${esc(x.msg)}</span> <b class="${ok?'ok':'mu'}">${ok?'✔ Corregit':'● Encara hi és'}</b></li>`});
+ h+='</ul>';
+ const nw=n.filter(x=>!ko.has(x.sev+'|'+x.msg));
+ if(nw.length){h+='<h2 style="margin-top:14px">Nous en el codi editat</h2><ul>';nw.forEach(x=>{h+=`<li class="d ${x.sev}"><b>${LB[x.sev]} · línia ${x.line}</b> <span>${esc(x.msg)}</span></li>`});h+='</ul>'}
+ const oL=firstCode.split('\n'),nL=cur0.split('\n');h+='<h2 style="margin-top:14px">Línies modificades</h2>';
+ if(oL.length!==nL.length)h+=`<p class="mu">El nombre de línies ha canviat (${oL.length} → ${nL.length}), així que no es pot comparar línia a línia.</p>`;
+ else{const ch=[];oL.forEach((l,i)=>{if(l!==nL[i])ch.push(`<li>Línia ${i+1}: <code>${esc(l.trim())}</code> → <code>${esc(nL[i].trim())}</code></li>`)});
+  h+=ch.length?'<ul>'+ch.slice(0,25).join('')+'</ul>'+(ch.length>25?`<p class="mu">…i ${ch.length-25} més.</p>`:''):'<p class="mu">Cap línia modificada.</p>'}
+ h+='<div class="r"><button id="cx">Tancar comparació</button></div>';
+ const c=$('cmpc');c.innerHTML=tr(h);c.hidden=false;$('cx').onclick=()=>{c.hidden=true};c.scrollIntoView({behavior:'smooth',block:'nearest'})}
+$('bo').onclick=()=>{if(firstCode!==null)$('ask').hidden=false};
+$('a1').onclick=()=>{$('ask').hidden=true;$('cmpc').hidden=true;src.value=firstCode;compile(true)};
+$('a2').onclick=()=>{$('ask').hidden=true;renderCmp()};
+$('a3').onclick=()=>{$('ask').hidden=true};
+src.addEventListener('paste',e=>{if(firstCode===null&&!src.value.trim()){const t=((e.clipboardData||window.clipboardData).getData('text')||'').replace(/\r\n?/g,'\n');if(t.trim()){firstCode=t;$('bo').disabled=false}}});
+const KT={nom:'Nom de variable mal escrit',espai:"Espai dins d'un nom de variable",coma:'Coma que faltava',tanca:'Tancament del SI incorrecte',llavors:'Falta LLAVORS'};
+function applyAll(t){const d=diag(t,true),fx=d.filter(x=>x.fix).map(x=>x.fix);
+ const items=fx.map(f=>{const ls=f.pos?t.lastIndexOf('\n',f.pos-1)+1:0;let le=t.indexOf('\n',f.pos);if(le<0)le=t.length;
+  const b=t.slice(ls,le),w=b.length-b.trimStart().length,a=b.slice(0,f.pos-ls)+f.text+b.slice(f.end-ls);
+  return{f,line:t.slice(0,f.pos).split('\n').length,b:b.slice(w),a:a.slice(w),x:f.pos-ls-w,y:f.end-ls-w}});
+ items.sort((p,q)=>p.line-q.line||p.f.pos-q.f.pos);
+ let v=t;fx.slice().sort((p,q)=>q.pos-p.pos).forEach(f=>{v=v.slice(0,f.pos)+f.text+v.slice(f.end)});return{code:v,items}}
+const hl=(l,a,b)=>esc(l.slice(0,a))+'<mark>'+esc(l.slice(a,b))+'</mark>'+esc(l.slice(b));
+function panel(h){const c=$('cmpc');c.innerHTML=tr(h+'<div class="r"><button id="cx">Tancar</button></div>');c.hidden=false;$('cx').onclick=()=>{c.hidden=true};c.scrollIntoView({behavior:'smooth',block:'nearest'})}
+function showFixed(r){const rem=diag(r.code),er=rem.filter(x=>x.sev==='er'),rec=rem.filter(x=>x.sev!=='er'),n=r.items.length;
+ let h='<h2>Codi corregit · resum dels canvis</h2>';
+ h+=n?`<p class="lead"><b>${n} correcci${n>1?'ons':'ó'} aplicad${n>1?'es':'a'}</b> al teu primer codi. Només s'ha modificat allò que estava marcat: l'ordre, la sangria i l'estructura del programa són els mateixos.</p>`
+  :'<p class="lead"><b>No hi havia res per a corregir automàticament.</b> El teu codi no té errors d\'escriptura detectables.</p>';
+ r.items.forEach((it,i)=>{h+=`<div class="fx"><h3>${i+1}. ${KT[it.f.kind]||'Correcció'} <span class="mu" style="font-weight:400">· línia ${it.line}</span></h3><div class="dl"><span>Abans</span><code>${it.x===it.y?esc(it.b):hl(it.b,it.x,it.y)}</code><span>Després</span><code>${hl(it.a,it.x,it.x+it.f.text.length)}</code></div><p><b>Per què:</b> ${esc(it.f.why)}</p></div>`});
+ h+='<h2 style="margin-top:14px">Resultat</h2>';
+ h+=er.length?`<p class="lead er"><b>Encara queden ${er.length} error${er.length>1?'s':''} que cal revisar a mà:</b></p><ul>`+er.map(x=>`<li class="d er"><b>línia ${x.line}</b> <span>${esc(x.msg)}</span></li>`).join('')+'</ul>'
+  :'<p class="lead ok"><b>✔ El codi compila sense errors</b> i ja es pot executar.</p>';
+ if(rec.length)h+='<h2 style="margin-top:14px">Millores recomanades (no aplicades)</h2><p class="mu" style="margin:0 0 6px;font-size:13px">No s\'han canviat soles perquè afecten la lògica del programa: decideix tu si t\'interessen.</p><ul>'+rec.map(x=>`<li class="d ${x.sev}"><b>${LB[x.sev]} · línia ${x.line}</b> <span>${esc(x.msg)}</span></li>`).join('')+'</ul>';
+ panel(h)}
+const EXT={va:['Exemple carregat · programa correcte de l\'aparcament','Encara no has apegat cap codi, així que s\'ha carregat una versió correcta de referència. Apega el teu codi i torna a prémer el botó per a veure les correccions concretes.',[['Tarifes amb SI niuats','El preu per hora depén de les hores aparcades. Amb un SINO ja no cal repetir «Hores_aparcat > 2»: si no és ≤ 2, ja és major que 2.'],['Descompte sempre definit','«descompte» val 0 quan no hi ha targeta. Així es pot mostrar i restar sempre, sense variables sense valor.'],['Missatges dins de cada branca','«canvi» i «falten» només es calculen i es mostren en la seua branca, de manera que mai eixen dos missatges contradictoris alhora.'],['Cas de pagament exacte','Quan els diners coincideixen amb el preu hi ha una tercera branca que ho indica; abans la variable quedava sense valor.']]],
+es:['Ejemplo cargado · programa correcto del aparcamiento','Aún no has pegado ningún código, así que se ha cargado una versión correcta de referencia. Pega tu código y vuelve a pulsar el botón para ver las correcciones concretas.',[['Tarifas con SI anidados','El precio por hora depende de las horas aparcadas. Con un SINO ya no hace falta repetir «horas_aparcado > 2»: si no es ≤ 2, ya es mayor que 2.'],['Descuento siempre definido','«descuento» vale 0 cuando no hay tarjeta. Así se puede mostrar y restar siempre, sin variables sin valor.'],['Mensajes dentro de cada rama','«cambio» y «faltan» solo se calculan y se muestran en su rama, de modo que nunca salen dos mensajes contradictorios a la vez.'],['Caso de pago exacto','Cuando el dinero coincide con el precio hay una tercera rama que lo indica; antes la variable se quedaba sin valor.']]]};
+function showExample(){const e=EXT[LANG];panel(`<h2>${e[0]}</h2><p class="lead">${e[1]}</p>`+e[2].map(p=>`<div class="fx"><h3>${p[0]}</h3><p>${p[1]}</p></div>`).join(''))}
+$('bc').onclick=()=>{$('ask').hidden=true;if(firstCode===null){src.value=LANG==='es'?FIXED_ES:FIXED;compile(true);showExample();return}
+ const r=applyAll(firstCode);src.value=r.code;compile(true);showFixed(r)};
+$('fx').onclick=()=>{clearTimeout(tm);compile();let v=src.value;fixes.slice().sort((a,b)=>b.pos-a.pos).forEach(f=>{v=v.slice(0,f.pos)+f.text+v.slice(f.end)});src.value=v;compile()};
+if(window.ResizeObserver)new ResizeObserver(()=>{$('gt').style.height=src.offsetHeight+'px'}).observe(src);
+$('be').onclick=()=>{fullOn=!fullOn;if(fullOn){prevH=src.style.height;src.style.overflowY='hidden';src.style.resize='none';$('be').textContent='Tornar a la mida normal'}else{src.style.height=prevH;src.style.overflowY='';src.style.resize='';$('be').textContent='Veure tot el codi'}fit();src.scrollTop=0;$('gt').scrollTop=0};
+src.addEventListener('scroll',()=>{$('gt').scrollTop=src.scrollTop});['keyup','click','focus','blur'].forEach(ev=>src.addEventListener(ev,gut));
+const WEL={va:{tg:'Compilador de pseudocodi',t:'Benvingut al Compilador de Pseudocodi de Manuel Loharces',sub:'Escriu o apega el teu algoritme: el programa l\'analitza, t\'avisa dels errors, el corregeix i l\'executa. Funciona en valencià i en castellà.',h:'Com està fet',st:[['Analitzador lèxic','Llig el text caràcter a caràcter i el converteix en tokens: paraules clau, noms de variable, números, textos i operadors.'],['Analitzador sintàctic','Un parser de descens recursiu comprova l\'estructura (INICI, SI…FI_SI, MOSTRAR…) i construeix l\'arbre sintàctic (AST).'],['Anàlisi semàntica','Segueix el flux del programa per a detectar variables no definides o sense valor, noms semblants (distància de Levenshtein) i possibles millores.'],['Intèrpret','Recorre l\'arbre i executa el programa amb els valors que introduïsques, mostrant el resultat i les variables.'],['Correccions segures','Cada correcció modifica només el tros marcat, sense canviar l\'ordre del teu codi, i s\'explica el perquè de cada canvi.']],by:'Fet per Manuel Loharces Melchor & Claude (Anthropic)',go:'Començar'},
+es:{tg:'Compilador de pseudocódigo',t:'Bienvenido al Compilador de Pseudocódigo de Manuel Loharces',sub:'Escribe o pega tu algoritmo: el programa lo analiza, te avisa de los errores, lo corrige y lo ejecuta. Funciona en valenciano y en castellano.',h:'Cómo está hecho',st:[['Analizador léxico','Lee el texto carácter a carácter y lo convierte en tokens: palabras clave, nombres de variable, números, textos y operadores.'],['Analizador sintáctico','Un parser de descenso recursivo comprueba la estructura (INICIO, SI…FIN_SI, ESCRIBIR…) y construye el árbol sintáctico (AST).'],['Análisis semántico','Sigue el flujo del programa para detectar variables no definidas o sin valor, nombres parecidos (distancia de Levenshtein) y posibles mejoras.'],['Intérprete','Recorre el árbol y ejecuta el programa con los valores que introduzcas, mostrando el resultado y las variables.'],['Correcciones seguras','Cada corrección modifica solo el trozo marcado, sin cambiar el orden de tu código, y se explica el porqué de cada cambio.']],by:'Hecho por Manuel Loharces Melchor & Claude (Anthropic)',go:'Empezar'}};
+function renderWel(){const w=WEL[LANG],e=$('wel');
+ e.innerHTML=`<div class="wcard"><div class="r" style="justify-content:space-between;margin:0 0 4px"><span class="tg">${w.tg}</span><div class="lang"><button id="wv" class="${LANG==='va'?'on':''}">Valencià</button><button id="we" class="${LANG==='es'?'on':''}">Castellano</button></div></div><h2 class="wt">${w.t}</h2><p class="mu" style="margin:0 0 12px">${w.sub}</p><h2>${w.h}</h2>`
+ +w.st.map((p,i)=>`<div class="stp"><i>${i+1}</i><div><b>${p[0]}</b><span>${p[1]}</span></div></div>`).join('')
+ +`<p class="mu" style="font-size:12px;margin:14px 0">${w.by}</p><button class="p" id="wgo" style="width:100%;padding:10px">${w.go}</button></div>`;
+ $('wv').onclick=()=>setLang('va');$('we').onclick=()=>setLang('es');$('wgo').onclick=()=>{e.hidden=true}}
+const KD={es:{INICI:'INICIO',LLEGIR:'LEER',LLAVORS:'ENTONCES',FI_SI:'FIN_SI',SI_FI:'SI_FIN',FI:'FIN',MOSTRAR:'ESCRIBIR',AND:'AND',OR:'OR',NOT:'NOT'},va:{INICI:'INICI',LLEGIR:'LLEGIR',LLAVORS:'LLAVORS',FI_SI:'FI_SI',SI_FI:'SI_FI',FI:'FI',MOSTRAR:'MOSTRAR',AND:'AND',OR:'OR',NOT:'NOT'}};
+function convertKw(t,from,to){const old=LANG;LANG=from;const T=lex(t,[]);LANG=old;let v=t;
+ T.filter(k=>k.t==='kw'&&KD[to][k.v]&&t.slice(k.pos,k.end)!==KD[to][k.v]&&!(to==='es'&&['AND','OR','NOT'].includes(k.v))).sort((a,b)=>b.pos-a.pos).forEach(k=>{v=v.slice(0,k.pos)+KD[to][k.v]+v.slice(k.end)});return v}
+let prevLang='va';
+function refreshUI(){document.documentElement.lang=LANG==='es'?'es':'ca';document.title=tr('Compilador de pseudocodi');
+ document.querySelectorAll('[data-t]').forEach(e=>{e.innerHTML=tr(e._o)});
+ src.placeholder=tr('Escriu ací el teu codi...');$('bo').title=tr('Encara no has apegat cap codi');
+ $('be').textContent=tr(fullOn?'Tornar a la mida normal':'Veure tot el codi');
+ $('lv').className=LANG==='va'?'on':'';$('le').className=LANG==='es'?'on':'';
+ renderWel();$('cmpc').hidden=true;$('ask').hidden=true;fxUpd();compile(true)}
+function setLang(l){if(l===LANG)return;prevLang=LANG;LANG=l;refreshUI();
+ if(src.value.trim()&&$('wel').hidden){const es=l==='es',c=$('conv');
+  c.innerHTML=`<div>${es?'Idioma cambiado a castellano. ¿Quieres convertir las palabras clave de tu código (INICI→INICIO, LLEGIR→LEER, LLAVORS→ENTONCES…)?':'Idioma canviat a valencià. Vols convertir les paraules clau del teu codi (INICIO→INICI, LEER→LLEGIR, ENTONCES→LLAVORS…)?'}</div><div class="r"><button class="p" id="cv1">${es?'Convertir':'Convertir'}</button><button id="cv2">${es?'Dejarlo así':'Deixar-ho així'}</button></div>`;
+  c.hidden=false;$('cv2').onclick=()=>{c.hidden=true};
+  $('cv1').onclick=()=>{src.value=convertKw(src.value,prevLang,LANG);if(firstCode!==null)firstCode=convertKw(firstCode,prevLang,LANG);c.hidden=true;compile(true)}}}
+document.querySelectorAll('[data-t]').forEach(e=>{e._o=e.innerHTML});
+$('lv').onclick=()=>setLang('va');$('le').onclick=()=>setLang('es');$('ab').onclick=()=>{$('wel').hidden=false};
+renderWel();
+src.value='';compile();
+</script></body></html>
